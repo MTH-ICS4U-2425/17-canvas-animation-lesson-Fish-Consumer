@@ -10,7 +10,7 @@
 'use strict';
 
 import Player from "./player.js";
-import { CANVAS, CTX, MS_PER_FRAME, KEYS } from "./globals.js";
+import { CANVAS, CTX, MS_PER_FRAME, KEYS, FLOOR } from "./globals.js";
 
 // Globals
 const HERO = new Player(20, 50, 48, 48);
@@ -30,7 +30,17 @@ document.addEventListener("contextmenu", (event) => {
  * The user pressed a key on the keyboard 
  */
 function keypress(event) {
-
+  if (event.keyCode == KEYS.SPACE){
+    HERO.Jump();
+  }
+  if (event.keyCode == KEYS.LEFT_ARROW){
+    HERO.Move(-1);
+  }
+  if (event.keyCode == KEYS.RIGHT_ARROW){
+    HERO.Move(1);
+  }
+  
+  
 }
 
 
