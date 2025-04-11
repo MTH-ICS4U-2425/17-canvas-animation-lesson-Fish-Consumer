@@ -21,9 +21,10 @@ export default class Player {
     }
     this.velocity = {
       x: 0,
-      max_X: 3,
+      max_X: 6,
       y: 0,
-      max_Y: 14.7
+      max_Y: -100,
+      X_deceleration: 0.89
     };
   }
 
@@ -34,23 +35,23 @@ export default class Player {
    */
   update() {
     this.draw();
-    console.log(Math.min(this.velocity.x,10));
+    // console.log(this.velocity.y);
     this.position.x += this.velocity.x;
 
-    if (this.position.y>=FLOOR-this.height){
+    if (this.position.y - this.velocity.y >= FLOOR-this.height){
       this.position.y = FLOOR-this.height;
       this.velocity.y = 0;
 
     } else {
-      if (this.velocity.y<=this.velocity.max_Y){
+      if (this.velocity.y > this.velocity.max_Y){
         this.velocity.y -= GRAVITY;
 
       } else {this.velocity.y = this.velocity.max_Y}
       this.position.y -= this.velocity.y;
     }
 
-    this.velocity.x*=0.9;
-    if (Math.abs(this.velocity.x) < 0.001){
+    this.velocity.x *= this.velocity.X_deceleration;
+    if (Math.abs(this.velocity.x) < 0.1){
       this.velocity.x = 0;
     }
 
@@ -60,7 +61,7 @@ export default class Player {
    */
   Jump(){
     if (this.position.y == FLOOR-this.height){
-      this.velocity.y = 15;
+      this.velocity.y = 100;
       this.position.y--;
     }
   }
