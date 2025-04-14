@@ -61,7 +61,7 @@ export default class Player {
    */
   Jump(){
     if (this.position.y == FLOOR-this.height){
-      this.velocity.y = 100;
+      this.velocity.y = 20;
       this.position.y--;
     }
   }

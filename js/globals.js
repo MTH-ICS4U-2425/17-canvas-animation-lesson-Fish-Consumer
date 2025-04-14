@@ -21,6 +21,11 @@ export const MS_PER_FRAME = 1000 / FPS;
 // Movement
 export const GRAVITY = 1;
 export const FLOOR = CANVAS.height-28;  // Careful - if the height ever changes...
+export function randInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 // Some convenient keyboard codes
 export const KEYS = {
