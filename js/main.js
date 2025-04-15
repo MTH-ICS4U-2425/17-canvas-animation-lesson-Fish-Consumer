@@ -21,15 +21,21 @@ let KeysDown = {
   */
  isPressed: new Array(100).fill(false),
 }
-const CactusArray = [];
 // code for ground tiles
 let ground = new Image();
 ground.src = "../images/dino_large.png";
 // in px per millisecond
 let ground_speed = 5;
 const groundAssetsShown = [];
+
+/* cactus variables*/
+const CactusArray = [];
+//small cacti have a px difference of 34 ()
+const CactusImageCo_ordinates = [ [446,2,34,70],[480,2,68,70],[514,2,102,70]
+
+]
 // in milliseconds
-let GTimer = 5;
+let CactusTimer = 500;
 class GroundSegemnt{
   /**
    * 
@@ -37,32 +43,34 @@ class GroundSegemnt{
    * @param {number} y 
    * @param {Array[image,cx,cy,cw,ch,px,py,pw,ph]} img 
    */
-  constructor(x,y,GID,specificImageDimensions = [102,200,280,300,200,28],isCactus = false){
+  constructor(x,y,GID,isCactus = false){
     this.x = x;
     this.y = y;
-    this.groundSection = GID;
-    this.SpImDi = specificImageDimensions;
     this.isCactus = isCactus;
+    if (isCactus){
+      this.SpImDi = CactusImageCo_ordinates[GID];
+    } else {
+      this.SpImDi = GID;
+    }
   }
 
   Move(speed){
-    if (!this.isCactus){
-      console.log(this.SpImDi[0]);
-    }
     this.x -= speed;
     if (this.isCactus){
-      CTX.drawImage(ground,455,this.SpImDi[0],this.SpImDi[1],this.SpImDi[2],this.x,this.SpImDi[3],this.SpImDi[4],this.SpImDi[5]);
+      CTX.drawImage(ground,this.SpImDi[0],this.SpImDi[1],this.SpImDi[2],this.SpImDi[3],this.x,this.FLOOR-this.SpImDi[2],this.SpImDi[2],this.SpImDi[3]);
     } else {
-      CTX.drawImage(ground,this.groundSection*200,102,200,280,this.x,300,200,28);
+      CTX.drawImage(ground,this.SpImDi*200,102,200,28,this.x,300,200,28);
     }
     if (this.x<=-200){
-      if (this.isCactus){
-
-      } else {
-        
-        this.groundSection = randInt(0,11);
+      if (this.isCactus&&CactusTimer<=0){
+        CactusTimer = randInt(7,11)*100;
+        this.SpImDi = CactusImageCo_ordinates[randInt(0,2)];
+        this.x = Math.floor((CANVAS.width+200)/200)*200;
+      } else if (!this.isCactus) {
+        this.SpImDi = randInt(0,11);
+        this.x = Math.floor((CANVAS.width+200)/200)*200;
       }
-      this.x = Math.floor((CANVAS.width+200)/200)*200;
+      
       
     }
   }
@@ -77,8 +85,9 @@ document.addEventListener("keyup", keylift);
 for (let i = 0; i-2<Math.floor(CANVAS.width/200);i++){
   groundAssetsShown.push(new GroundSegemnt(i*200,0,1));
 }
-for (let i = 0; i <= 5;i++){
-  CactusArray.push(new GroundSegemnt(CANVAS.width,0,i,[2,34,70,50,34,70],true))
+for (let i = 0; i <= 3;i++){
+  CactusArray.push(new GroundSegemnt(CANVAS.width-
+    ((i+1)*100*randInt(6,9)),0,0,true));
 }
 // Disable the context menu on the entire document
 document.addEventListener("contextmenu", (event) => { 
@@ -127,14 +136,14 @@ function update() {
   if (KeysDown.isPressed[KEYS.RIGHT_ARROW]){
     HERO.Move(1);
   }
-
+  CactusTimer -= EXCESS_TIME;
   // Clear the canvas
   CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
   
-  // Draw ground
+  // Draw ground (and cacti)
   CTX.drawImage(ground,446,2,34,70,50,50,34,70);
-  CactusArray.map((x)=>x.Move(ground_speed))
   groundAssetsShown.map((x)=>x.Move(ground_speed));
+  CactusArray.map((x)=>x.Move(ground_speed))
 
   // Draw our hero
   HERO.update();
