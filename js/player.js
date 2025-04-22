@@ -8,19 +8,27 @@
  * Author: 
  */
 
-import { CTX, CANVAS, GRAVITY, FLOOR, KEYS } from "./globals.js"
-
-let ground = new Image();
-ground.src = "../images/dino_large.png";
+import { CTX, CANVAS, GRAVITY, FLOOR, KEYS, ground, debugMode } from "./globals.js"
 
 export default class Player {
   isDucking = false;
   animationFrame = 0;
   // in frames
   groundedAnimationTimer = 0;
-  constructor(x, y, width, height) {
+  /**
+   * 
+   * @param {*} x 
+   * @param {*} y 
+   * @param {*} width 
+   * @param {*} height 
+   * @param {*} hitBoxWidthSize 
+   * @param {float} hitBoxHeightSize a multiplier of how large the hitbox should be compared to the actual width/height
+   */
+  constructor(x, y, width, height, hitBoxWidthSize = 1, hitBoxHeightSize = 1) {
     this.width = width;
     this.height = height;
+    this.boxWidth = hitBoxWidthSize;
+    this.boxHeight = hitBoxHeightSize;
 
     this.position = {
       x: x,
@@ -69,9 +77,9 @@ export default class Player {
   /**
    * a jump function
    */
-  Jump(){
+  Jump(jumpVelo){
     if (this.position.y == FLOOR-this.height){
-      this.velocity.y = 20;
+      this.velocity.y = jumpVelo;
       this.position.y--;
     }
   }
@@ -140,7 +148,8 @@ export default class Player {
     this.height = frameData[3];
     this.width = frameData[2];
     CTX.fillStyle = "yellow";
-    CTX.fillRect(this.position.x, this.position.y, this.width, this.height);
+    if (debugMode) CTX.fillRect(this.position.x + ((this.width/2)*(1-this.boxWidth)), this.position.y + ((this.height/2)*(1-this.boxHeight)), this.width*this.boxWidth,this.height*this.boxHeight);
     CTX.drawImage(ground,frameData[0],frameData[1],frameData[2],frameData[3],this.position.x,this.position.y,frameData[2],frameData[3]);
+  
   }
 }
