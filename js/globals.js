@@ -23,7 +23,7 @@ let why = new Image();
 why.src = "../images/dino_large.png";
 export const ground = why;
 
-export const debugMode = true;
+export const debugMode = false;
 
 
 // Movement
