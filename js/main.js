@@ -24,6 +24,14 @@ let KeysDown = {
   */
  isPressed: new Array(100).fill(false),
 }
+
+/**
+ * gameStates
+ * 0 = when dino dies
+ * 1 = waiting for player to not be holding down space ;
+ * 2 = main gameplay currently running
+ * 3 = title screen
+ */
 let gameState = 3;
 // in px per millisecond
 let ground_speed = 5;
@@ -127,8 +135,11 @@ function keylift(event) {
   KeysDown.isPressed[event.keyCode] = false;
 }
 
+for (let i = 0; i-2<Math.floor(CANVAS.width/200);i++){
+  groundAssetsShown.push(new GroundSegemnt(i*200,0,1));
+}
 /**
- * 
+ * to reset the game
  */
 function reset(){
   score = 0;
@@ -146,6 +157,19 @@ function reset(){
   gameState = 2;
   HERO.velocity.x = 0;
   HERO.velocity.y = 0;
+}
+
+// width between images is 17px
+function displayScore(givenScore){
+  let currentNum = 0;
+  // this is some odd reusing, but it works
+  for(let i = 0;givenScore/(10**i)>=1 ;i++){
+    currentNum = 10**i;
+    currentNum = Math.floor(givenScore/currentNum);
+    currentNum = ((currentNum/10)-Math.floor(currentNum/10))*10;
+
+    CTX.drawImage(ground,1294+(currentNum*20),2,17,20,CANVAS.width-((i+1)*20),10,17,20);
+  }
 }
 
 /**
@@ -179,8 +203,7 @@ function update() {
     HERO.Duck(false)
   }
   CactusTimer--;
-  score++;
-  console.log(score)
+  score += 0.2;
   // Clear the canvas
   CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
@@ -192,11 +215,16 @@ function update() {
   
   // is colliding with player?
   CactusArray.map((x)=>x.cactiHitboxColliding(HERO.position.x+(HERO.width/2),HERO.position.y+(HERO.height/2),HERO.width*HERO.boxWidth,HERO.height*HERO.boxHeight));
+  displayScore(Math.floor(score));
+
   } else if(gameState==1){
     if (!KeysDown.isPressed[KEYS.SPACE]) gameState=0;
+
   } else if (gameState==3){
-    CTX.drawImage(ground,446,2,34,70,50,50,34,70);
+    groundAssetsShown.map((x)=>x.Move(0));
+    CTX.drawImage(ground,1679,2,86,93,50,FLOOR-93,86,93);
     if (KeysDown.isPressed[KEYS.SPACE]) reset();
+
   }else {
     // the splash screen
     if (KeysDown.isPressed[KEYS.SPACE]) reset();

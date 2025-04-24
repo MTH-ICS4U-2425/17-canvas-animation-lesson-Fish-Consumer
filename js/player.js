@@ -68,6 +68,14 @@ export default class Player {
       this.position.y -= this.velocity.y;
     }
 
+    if (this.position.x+this.velocity.x<=0){
+      this.position.x = 1;
+      this.velocity.x = 0;
+    } else if (this.position.x+this.velocity.x>=CANVAS.width-86){
+      this.position.x = CANVAS.width-86;
+      this.velocity.x = 0;
+    }
+    
     this.velocity.x *= this.velocity.X_deceleration;
     if (Math.abs(this.velocity.x) < 0.1){
       this.velocity.x = 0;
@@ -113,7 +121,7 @@ export default class Player {
   * ID[3] = Hieght on image sheet
   */
   DinoImageFrame = [
-    [1855,2,86,93],[1943,2,86,93],[1679,2,86,93],[2206,36,118,59],[2324,36,118,59]
+    [1855,2,86,93],[1943,2,86,93],[1679,2,86,93],[2207,36,117,59],[2325,36,117,59]
   ]
   
 
