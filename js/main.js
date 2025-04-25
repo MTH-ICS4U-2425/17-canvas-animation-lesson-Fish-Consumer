@@ -81,7 +81,7 @@ class GroundSegemnt{
      }
      if (this.x<=-200){
        if (this.isCactus&&CactusTimer<=0){
-         CactusTimer = randInt(4,6)*20;
+         CactusTimer = randInt(4,6)*20/(ground_speed/10);
          this.SpImDi = CactusImageCo_ordinates[randInt(0,5)];
          this.x = Math.floor((CANVAS.width+200)/200)*200;
        } else if (!this.isCactus) {
@@ -142,6 +142,7 @@ for (let i = 0; i-2<Math.floor(CANVAS.width/200);i++){
  * to reset the game
  */
 function reset(){
+  ground_speed = 5;
   score = 0;
   groundAssetsShown = [];
   CactusArray = [];
@@ -159,6 +160,10 @@ function reset(){
   HERO.velocity.y = 0;
 }
 
+/**
+ * 
+ * @param {Int} givenScore 
+ */
 // width between images is 17px
 function displayScore(givenScore){
   let currentNum = 0;
@@ -172,6 +177,16 @@ function displayScore(givenScore){
   }
 }
 
+let sizeM = 1;
+// small animation for when you start the game
+function revealGround(byHowMuch){
+  sizeM -= byHowMuch;
+  if (sizeM>0.01){
+    CTX.save();
+    CTX.arc(96,FLOOR-46,100/sizeM, 0, 2 * Math.PI)
+    CTX.clip();
+  }
+}
 /**
  * The main game loop
  */
@@ -188,9 +203,9 @@ function update() {
   frame_time = NOW - EXCESS_TIME
   /*** END FPS Trap ***/
   if (gameState==2){
-  if (KeysDown.isPressed[KEYS.SPACE]||KeysDown.isPressed[KEYS.UP_ARROW]){
-    HERO.Jump(21);
-  }
+    if (KeysDown.isPressed[KEYS.SPACE]||KeysDown.isPressed[KEYS.UP_ARROW]){
+      HERO.Jump(21);
+    }
   if (KeysDown.isPressed[KEYS.LEFT_ARROW]){
     HERO.Move(-1);
   }
@@ -203,11 +218,15 @@ function update() {
     HERO.Duck(false)
   }
   CactusTimer--;
-  score += 0.2;
+  score += 0.2*(ground_speed/5);
+  if (ground_speed<25){
+    ground_speed+=0.001;
+  } else ground_speed = 25;
+  
   // Clear the canvas
   CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
-
   // Draw ground (and cacti)
+  revealGround(0.01);
   groundAssetsShown.map((x)=>x.Move(ground_speed));
   CactusArray.map((x)=>x.Move(ground_speed))
   // Draw our hero
@@ -216,15 +235,16 @@ function update() {
   // is colliding with player?
   CactusArray.map((x)=>x.cactiHitboxColliding(HERO.position.x+(HERO.width/2),HERO.position.y+(HERO.height/2),HERO.width*HERO.boxWidth,HERO.height*HERO.boxHeight));
   displayScore(Math.floor(score));
-
-  } else if(gameState==1){
-    if (!KeysDown.isPressed[KEYS.SPACE]) gameState=0;
-
-  } else if (gameState==3){
-    groundAssetsShown.map((x)=>x.Move(0));
-    CTX.drawImage(ground,1679,2,86,93,50,FLOOR-93,86,93);
+  CTX.restore();
+} else if(gameState==1){
+  if (!KeysDown.isPressed[KEYS.SPACE]) gameState=0;
+  
+} else if (gameState==3){
+  revealGround(0);
+  groundAssetsShown.map((x)=>x.Move(0));
+  CTX.drawImage(ground,1679,2,86,93,50,FLOOR-93,86,93);
+  CTX.restore();
     if (KeysDown.isPressed[KEYS.SPACE]) reset();
-
   }else {
     // the splash screen
     if (KeysDown.isPressed[KEYS.SPACE]) reset();
